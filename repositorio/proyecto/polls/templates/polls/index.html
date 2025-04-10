@@ -1,9 +1,9 @@
 {% if latest_question_list %}
     <ul>
     {% for question in latest_question_list %}
-        <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
+        <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
         <!-- La manera de arriba es igual a la de abajo, solo que con la notación % url, puedo eliminar la dependencia de rutas URL específicas  -->
-        <!-- Se escribe 'detail' ya que en urls.py está especificada con name='detail'    -->
+        <!-- Se escribe 'polls:detail' ya que, en urls.py, el nombre es polls y la url de detalles está especificada con name='detail'    -->
         <!-- <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li> -->
          
     {% endfor %}
