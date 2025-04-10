@@ -1,34 +1,32 @@
-from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.db.models import F
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.shortcuts import render, get_object_or_404
+from django.views import generic
 
 from .models import Choice, Question
 
-def index(request):
-    latest_question_list = Question.objects.order_by("-pub_date")[:5]
-    context = {
-        "latest_question_list": latest_question_list,
-    }
-    return render(request, "polls/index.html", context)
-    # Utilizando render no es necesario asignarle valor a una variable template, ni importar loader ni HttpResponse
+# Opción 1: usar ListView y la función get_queryset(self)
+class IndexView(generic.ListView):
+    template_name = "polls/index.html"
+    # Por defecto, se enviaría al template una variable question_list
+    context_object_name = "latest_question_list"
+    # Con context_object_name, lo puedo personalizar
 
-def detail(request, question_id):
-    try:
-        question = Question.objects.get(pk=question_id)
-    except Question.DoesNotExist:
-        raise Http404("Question does not exist")
-    return render(request, "polls/detail.html", {"question": question})
+    def get_queryset(self):
+        return Question.objects.order_by("-pub_date")[:5]
+    # Retorna las últimas 5 encuestas
 
-# Atajo 'get_object_or_404' para prácticas dónde haya excepción 404 si no hay objeto 
-# def detail(request, question_id):
-#    question = get_object_or_404(Question, pk=question_id)
-#    return render(request, "polls/detail.html", {"question": question})
+# Opción 2: usar DetailView y setear el valor de model
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = "polls/detail.html"
 
-def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, "polls/results.html", {"question": question})
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = "polls/results.html"
 
+# Siempre se utiliza template_name para usar una plantilla específica
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
